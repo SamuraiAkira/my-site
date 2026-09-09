@@ -365,9 +365,10 @@ h1{
     display: flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none;
 }
 .social-links a:hover{
-    transform: translateY(-2px);
+    transform: translateY(2px);
 }
 .cheat-cod{
     width: 100%;

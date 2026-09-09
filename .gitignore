@@ -1,0 +1,6 @@
+.vscode/
+.history/
+*.vsix
+
+.DS_Store
+Thumbs.db

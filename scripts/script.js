@@ -1,111 +1,88 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // --- Burger menu ---
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Элементы ---
     const burger = document.querySelector('.burger-menu');
     const mobileMenu = document.querySelector('.mobile-menu');
     const closeBtn = document.querySelector('.close-menu');
-    
-    // Создаем оверлей
     const overlay = document.createElement('div');
-    overlay.className = 'overlay';
-    document.body.appendChild(overlay);
 
-    function openMenu() {
+    // --- Оверлей (затемнение) ---
+    overlay.className = 'overlay';
+    document.body.prepend(overlay);
+
+    // --- Открытие / закрытие ---
+    const openMenu = () => {
         mobileMenu.classList.add('open');
         overlay.classList.add('active');
         burger.classList.add('active');
         burger.setAttribute('aria-expanded', 'true');
         document.body.style.overflow = 'hidden';
-    }
+    };
 
-    function closeMenu() {
+    const closeMenu = () => {
         mobileMenu.classList.remove('open');
         overlay.classList.remove('active');
         burger.classList.remove('active');
         burger.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
-    }
+    };
 
-    // Открытие меню
-    if (burger) {
-        burger.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (mobileMenu.classList.contains('open')) {
-                closeMenu();
-            } else {
-                openMenu();
-            }
-        });
-    }
+    // --- Обработчики ---
+    burger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        mobileMenu.classList.contains('open') ? closeMenu() : openMenu();
+    });
 
-    // Закрытие через крестик
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeMenu);
-    }
-
-    // Закрытие по клику на оверлей
+    closeBtn?.addEventListener('click', closeMenu);
     overlay.addEventListener('click', closeMenu);
 
-    // Закрытие меню при клике на любую ссылку в мобильном меню
-    const mobileLinks = mobileMenu.querySelectorAll('a');
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            // Если ссылка якорная - закрываем меню
-            closeMenu();
-        });
-    });
+    // --- Ссылки в мобильном меню ---
+    document.querySelectorAll('.mobile-menu a').forEach((link) => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
 
-    // Закрытие по клавише Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
-            closeMenu();
-        }
-    });
-
-    // --- Плавная прокрутка для якорных ссылок ---
-    // (на случай, если браузер не поддерживает scroll-behavior)
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-            const target = document.querySelector(href);
-            if (target) {
+            if (href?.startsWith('#')) {
                 e.preventDefault();
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+                const target = document.querySelector(href);
+                if (target) {
+                    closeMenu();
+                    setTimeout(() => {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 400);
+                }
+            } else {
+                closeMenu();
             }
         });
+    });
+
+    // --- Закрытие по Escape ---
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu?.classList.contains('open')) {
+            closeMenu();
+        }
     });
 
     // --- Konami Code ---
-    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'];
-    let currentIndex = 0;
-    let konamiActive = false;
+    const konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'];
+    let step = 0;
+    let active = false;
 
-    document.addEventListener('keydown', function(event) {
-        const key = event.key;
-        
-        if (key === konamiCode[currentIndex]) {
-            currentIndex++;
-            
-            if (currentIndex === konamiCode.length) {
-                activateKonamiCode();
-                currentIndex = 0;
+    document.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
+        if (e.key === konami[step]) {
+            step++;
+            if (step === konami.length) {
+                if (!active) {
+                    active = true;
+                    document.body.style.backgroundColor = '#ff6b6b';
+                    document.body.style.transition = 'background-color 0.5s';
+                    document.title = '🎮 KONAMI CODE!';
+                }
+                step = 0;
             }
         } else {
-            currentIndex = 0;
+            step = 0;
         }
     });
-
-    function activateKonamiCode() {
-        if (konamiActive) return;
-        
-        konamiActive = true;
-        console.log('🎮 Konami Code activated!');
-        
-        document.body.style.backgroundColor = '#ff6b6b';
-        document.body.style.transition = 'background-color 0.5s';
-        document.title = '🎮 KONAMI CODE!';
-    }
 });

@@ -48,7 +48,6 @@ h1{
 
 .navbar{
     position: relative;
-    z-index: 1000;
 }
 .logo{
     font-weight: 800;
@@ -104,13 +103,14 @@ h1{
     width: 300px;
     height: 100vh;
     background: #111111;
-    transition: right 0.3s ease;
+    transition: right ease;
     z-index: 1002;
     padding: 2rem;
     display: flex;
     flex-direction: column;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
+    pointer-events: auto !important;
 }
 .mobile-menu.open{
     right: 0;
@@ -368,7 +368,7 @@ h1{
     text-decoration: none;
 }
 .social-links a:hover{
-    transform: translateY(2px);
+    transform: translateY(-2px);
 }
 .cheat-cod{
     width: 100%;
@@ -481,6 +481,7 @@ h1{
 @media (max-width: 480px) {
     .wrapper{
         padding: 0.3rem;
+        margin: 1.25rem 0 1rem;
     }
     .container{
         padding: 0.8rem;

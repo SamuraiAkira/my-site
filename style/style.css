@@ -471,6 +471,9 @@ h1{
         align-items: center;
         margin-top: 0.5rem;
     }
+    .social-links{
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {

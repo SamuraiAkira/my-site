@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ['a', 'A', 'ф', 'Ф'],
         'Enter'
     ];
-    
+
     let step = 0;
 
 document.addEventListener('keydown', (e) => {
@@ -148,7 +148,7 @@ function startDestructionMode() {
         anim.className = 'click-animation';
 
         /* ▼▼▼  МЕСТО ДЛЯ ТВОЕГО GIF  ▼▼▼ */
-        anim.innerHTML = '<img src="assets/click.gif" alt="">';
+        anim.innerHTML = '<img src="assets/click-animation.gif" alt="">';
 
         anim.style.left = x + 'px';
         anim.style.top  = y + 'px';

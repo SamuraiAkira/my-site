@@ -147,7 +147,6 @@ function startDestructionMode() {
         const anim = document.createElement('div');
         anim.className = 'click-animation';
 
-        /* ▼▼▼  МЕСТО ДЛЯ ТВОЕГО GIF  ▼▼▼ */
         anim.innerHTML = '<img src="assets/click-animation.gif" alt="">';
 
         anim.style.left = x + 'px';

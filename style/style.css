@@ -253,9 +253,18 @@ h1{
 /* Separator */
 
 .separator{
+    position: relative;
     height: 3px;
     background: #111111;
     margin: 1.5rem 0;
+}
+.separator::before{
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 0;
+    right: 0;
+    bottom: -5px;
 }
 
 /* Projects */
@@ -504,4 +513,91 @@ h1{
     .cheat-cod{
         font-size: 0.65rem;
     }
+}
+
+/* РЕЖИМ УНИЧТОЖЕНИЯ */
+
+.destroy-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: destroyFadeIn 0.35s ease forwards;
+}
+
+@keyframes destroyFadeIn{
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+.destroy-popup{
+    background: #fafafa;
+    border: 3px solid #111111;
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.95);
+    padding: 2rem 2.5rem;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    max-width: 90vw;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.destroy-popup:hover{
+    transform: translate(-2px, -2px);
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.95);
+}
+.destroy-popup:active{
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.95);
+}
+.destroy-popup h3{
+    font-size: 1.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: #111111;
+    margin: 0 0 0.8rem 0;
+    line-height: 1.1;
+}
+.destroy-hint{
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #444444;
+    animation: destroyBlink 1.2s ease-in-out infinite;
+}
+@keyframes destroyBlink{
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.15; }
+}
+body.destruction-mode{
+    cursor: crosshair;
+}
+body.destruction-mode *{
+    cursor: crosshair !important;
+}
+.click-animation{
+    position: fixed;
+    width: 70px;
+    height: 70px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10000;
+    animation: clickAnim 0.55s ease-out forwards;
+}
+.click-animation img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+@keyframes clickAnim{
+    0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+}
+@media (max-width: 768px){
+    .destroy-overlay{ display: none !important; }
 }

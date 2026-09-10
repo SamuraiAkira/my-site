@@ -61,15 +61,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let destructionActive = false;
     let destroyModeTriggered   = false;
 
-    const destroyMode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
-                    'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight',
-                    'b','a','Enter'];
+    const destroyMode = [
+        'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+        'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+        ['b', 'B', 'и', 'И'],
+        ['a', 'A', 'ф', 'Ф'],
+        'Enter'
+    ];
+    
     let step = 0;
 
 document.addEventListener('keydown', (e) => {
     if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
 
-    step = e.key === destroyMode[step] ? step + 1 : 0;
+    const expected = destroyMode[step];
+    const matches  = Array.isArray(expected)
+        ? expected.includes(e.key)
+        : e.key === expected;
+
+    step = matches ? step + 1 : 0;
 
     if (step === destroyMode.length) {
         step = 0;

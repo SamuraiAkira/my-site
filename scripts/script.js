@@ -59,61 +59,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const isMobile = () => window.innerWidth <= 768;
 
     let destructionActive = false;
-    let konamiTriggered   = false;
+    let destroyModeTriggered   = false;
 
-    const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
+    const destroyMode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
                     'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight',
                     'b','a','Enter'];
     let step = 0;
 
-    document.addEventListener('keydown', (e) => {
-        if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+document.addEventListener('keydown', (e) => {
+    if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
 
-        if (e.key === konami[step]) {
-            step++;
-            if (step === konami.length) {
-                if (!konamiTriggered) {
-                    konamiTriggered = true;
+    step = e.key === destroyMode[step] ? step + 1 : 0;
 
-                    document.body.style.backgroundColor = '#ff6b6b';
-                    document.body.style.transition      = 'background-color 0.5s';
-                    document.title = 'С==';
+    if (step === destroyMode.length) {
+        step = 0;
+        if (destroyModeTriggered) return;
+        destroyModeTriggered = true;
 
-                    startDestructionMode();
-                }
-                step = 0;
-            }
-        } else {
-            step = 0;
-        }
-    });
+        document.body.style.cssText += 'background:#ff6b6b; transition:background-color .5s';
+        startDestructionMode();
+    }
+});
 
-    function startDestructionMode() {
-        if (isMobile()) return;
+function startDestructionMode() {
+    if (isMobile()) return;
 
-        document.title = '☠ РЕЖИМ УНИЧТОЖЕНИЯ';
-        const popupOverlay = document.createElement('div');
-        popupOverlay.className = 'destroy-overlay';
-        popupOverlay.innerHTML = `
+    document.title = '☠ РЕЖИМ УНИЧТОЖЕНИЯ';
+
+    const popupOverlay = Object.assign(document.createElement('div'), {
+        className: 'destroy-overlay',
+        innerHTML: `
             <div class="destroy-popup">
                 <h3>УНИЧТОЖЬ ВСЁ</h3>
                 <p class="destroy-hint">*Нажимай ЛКМ по сайту*</p>
-            </div>
-        `;
-        document.body.appendChild(popupOverlay);
+            </div>`
+    });
 
-        const popup = popupOverlay.querySelector('.destroy-popup');
+    document.body.appendChild(popupOverlay);
 
-        popup.addEventListener('click', (e) => {
-            e.stopPropagation();
-            popupOverlay.remove();
-            enableDestruction();
-        });
+    popupOverlay.querySelector('.destroy-popup').addEventListener('click', (e) => {
+        e.stopPropagation();
+        popupOverlay.remove();
+        enableDestruction();
+    });
 
-        popupOverlay.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-    }
+    popupOverlay.addEventListener('click', (e) => e.stopPropagation());
+}
 
     function enableDestruction() {
         destructionActive = true;

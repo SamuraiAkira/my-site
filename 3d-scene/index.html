@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Floppy Portfolio</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main id="scene"></main>
+
+  <div class="grain"></div>
+  <div class="scanlines"></div>
+
+  <header class="site-header">
+    <div class="brand">PORTFOLIO<span>_A:</span></div>
+    <div class="status"><i></i> SYSTEM READY</div>
+  </header>
+
+  <div id="loading">
+    <div class="loader-box">
+      <span>BOOTING</span>
+      <strong>3D PORTFOLIO</strong>
+      <small>PLEASE WAIT...</small>
+    </div>
+  </div>
+
+  <section id="intro">
+    <p class="eyebrow">A: / FLOPPY DRIVE</p>
+    <h1>Choose your <em>disk</em></h1>
+    <p class="sub">Hover to inspect · Click to insert</p>
+  </section>
+
+  <div id="diskLabels" aria-hidden="true"></div>
+
+  <div class="carousel-hint">
+    <span>←</span>
+    <div><b>01</b><i></i><b>06</b></div>
+    <span>→</span>
+  </div>
+
+  <div id="screenUI" class="hidden">
+    <button id="closeScreen" aria-label="Закрыть">×</button>
+    <div class="screen-frame">
+      <div class="screen-top"><span>FLOPPY://READ</span><span>● ONLINE</span></div>
+      <div id="screenContent"></div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from "three";
+    import { GLTFLoader } from
+      "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
+    import { OrbitControls } from
+      "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js";
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x070807);
+
+    const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.01, 200);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    document.querySelector("#scene").appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x151515, 2.0));
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
+    keyLight.position.set(5, 10, 8);
+    keyLight.castShadow = true;
+    scene.add(keyLight);
+
+    const rimLight = new THREE.DirectionalLight(0x8fb8ff, 1.1);
+    rimLight.position.set(-8, 5, -5);
+    scene.add(rimLight);
+
+    const loader = new GLTFLoader();
+    let model;
+    let selectedDisk = null;
+    let hoveredDisk = null;
+    let mode = "idle";
+    let animationStart = 0;
+    let animationFrom = null;
+    let homeCamera = null;
+
+    const diskNames = [
+      "floppy-yellow", "floppy-white", "floppy-pink",
+      "floppy-green", "floppy-blue", "floppy-black"
+    ];
+
+    const diskLabels = {
+      "floppy-yellow": "ABOUT",
+      "floppy-white": "PROJECTS",
+      "floppy-pink": "MUSIC",
+      "floppy-green": "CONTACT",
+      "floppy-blue": "GAMES",
+      "floppy-black": "SYSTEM"
+    };
+
+    const content = {
+      ABOUT: `<div class="terminal"><div class="title">A:\\ABOUT.TXT</div><p>&gt; Nikita</p><p>&gt; Developer</p><p>&gt; Web / Linux / 3D</p><br><p>&gt; Welcome.</p></div>`,
+      PROJECTS: `<div class="terminal"><div class="title">A:\\PROJECTS</div><p>&gt; MY WEBSITE</p><p>&gt; BLENDER EXPERIMENTS</p><p>&gt; HOME SERVER</p><p>&gt; LOCAL AI</p></div>`,
+      MUSIC: `<div class="terminal"><div class="title">A:\\MUSIC</div><p>&gt; AUDIO PLAYER</p><p>&gt; [ PLAY ]</p></div>`,
+      CONTACT: `<div class="terminal"><div class="title">A:\\CONTACT</div><p>&gt; GitHub</p><p>&gt; Telegram</p><p>&gt; Email</p></div>`,
+      GAMES: `<div class="terminal"><div class="title">A:\\GAMES</div><p>&gt; STEAM</p><p>&gt; CHESS</p><p>&gt; OTHER PROJECTS</p></div>`,
+      SYSTEM: `<div class="terminal"><div class="title">A:\\SYSTEM</div><p>&gt; CPU: ONLINE</p><p>&gt; MEMORY: OK</p><p>&gt; FLOPPY: READY</p><p>&gt; STATUS: 200 OK</p></div>`
+    };
+
+    const labelsRoot = document.querySelector("#diskLabels");
+    const labelEls = new Map();
+
+    function createDiskLabels() {
+      labelsRoot.innerHTML = "";
+      diskNames.forEach((name, index) => {
+        const el = document.createElement("div");
+        el.className = "disk-label";
+        el.innerHTML = `<span>0${index + 1}</span><b>${diskLabels[name]}</b>`;
+        labelsRoot.appendChild(el);
+        labelEls.set(name, el);
+      });
+    }
+
+    function showLoading(show) {
+      document.querySelector("#loading").classList.toggle("hidden", !show);
+    }
+
+    loader.load("./scene.glb", (gltf) => {
+      model = gltf.scene;
+      scene.add(model);
+
+      model.traverse((obj) => {
+        if (obj.isMesh) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+        }
+      });
+
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      const maxSize = Math.max(size.x, size.y, size.z);
+      const distance = maxSize * 1.45;
+
+      controls.target.copy(center);
+      camera.position.set(
+        center.x + distance * 0.95,
+        center.y + distance * 0.55,
+        center.z + distance * 0.95
+      );
+      controls.minDistance = maxSize * 0.35;
+      controls.maxDistance = maxSize * 4;
+
+      homeCamera = {
+        position: camera.position.clone(),
+        target: controls.target.clone()
+      };
+
+      createDiskLabels();
+      showLoading(false);
+    }, undefined, (error) => {
+      console.error(error);
+      document.querySelector("#loading strong").textContent = "SCENE ERROR";
+      document.querySelector("#loading small").textContent = "Check scene.glb";
+    });
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const worldPoint = new THREE.Vector3();
+
+    function getDiskFromPointer(event) {
+      if (!model) return null;
+      pointer.x = (event.clientX / innerWidth) * 2 - 1;
+      pointer.y = -(event.clientY / innerHeight) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+
+      const disks = diskNames.map(n => model.getObjectByName(n)).filter(Boolean);
+      const hits = raycaster.intersectObjects(disks, true);
+      if (!hits.length) return null;
+
+      let disk = hits[0].object;
+      while (disk.parent && !diskNames.includes(disk.name)) disk = disk.parent;
+      return diskNames.includes(disk.name) ? disk : null;
+    }
+
+    renderer.domElement.addEventListener("pointermove", (event) => {
+      if (!model || mode !== "idle") return;
+      const disk = getDiskFromPointer(event);
+      hoveredDisk = disk;
+
+      diskNames.forEach(name => {
+        const d = model.getObjectByName(name);
+        if (!d) return;
+        d.userData.hovered = d === hoveredDisk;
+      });
+
+      renderer.domElement.style.cursor = hoveredDisk ? "pointer" : "default";
+    });
+
+    renderer.domElement.addEventListener("pointerleave", () => {
+      hoveredDisk = null;
+      renderer.domElement.style.cursor = "default";
+    });
+
+    renderer.domElement.addEventListener("pointerdown", (event) => {
+      if (!model || mode !== "idle") return;
+      const disk = getDiskFromPointer(event);
+      if (disk) insertDisk(disk);
+    });
+
+    function insertDisk(disk) {
+      selectedDisk = disk;
+      mode = "inserting";
+      animationStart = performance.now();
+
+      animationFrom = {
+        position: disk.position.clone(),
+        rotation: disk.rotation.clone(),
+        scale: disk.scale.clone(),
+        cameraPosition: camera.position.clone(),
+        target: controls.target.clone()
+      };
+
+      disk.userData.targetPosition = new THREE.Vector3(-1.3, 2.55, -0.75);
+      document.querySelector("#intro").classList.add("hidden");
+      labelsRoot.classList.add("labels-hidden");
+    }
+
+    function updateInsertion(time) {
+      if (!selectedDisk || mode !== "inserting") return;
+
+      const raw = Math.min((time - animationStart) / 1500, 1);
+      const t = raw * raw * (3 - 2 * raw);
+      const target = selectedDisk.userData.targetPosition;
+
+      selectedDisk.position.lerpVectors(animationFrom.position, target, t);
+      selectedDisk.rotation.set(
+        animationFrom.rotation.x,
+        animationFrom.rotation.y + Math.sin(t * Math.PI) * 0.15,
+        animationFrom.rotation.z
+      );
+
+      if (raw >= 1) {
+        mode = "zooming";
+        animationStart = time;
+        animationFrom.cameraPosition = camera.position.clone();
+        animationFrom.target = controls.target.clone();
+      }
+    }
+
+    function updateZoom(time) {
+      if (mode !== "zooming") return;
+
+      const raw = Math.min((time - animationStart) / 1350, 1);
+      const t = raw * raw * (3 - 2 * raw);
+
+      const screenTarget = new THREE.Vector3(-1.58, 4.47, 0.25);
+      const targetCamera = new THREE.Vector3(-1.58, 4.45, -2.8);
+
+      camera.position.lerpVectors(animationFrom.cameraPosition, targetCamera, t);
+      controls.target.lerpVectors(animationFrom.target, screenTarget, t);
+
+      if (raw >= 1) {
+        mode = "screen";
+        const label = diskLabels[selectedDisk.name] || "SYSTEM";
+        document.querySelector("#screenContent").innerHTML = content[label] || content.SYSTEM;
+        document.querySelector("#screenUI").classList.remove("hidden");
+      }
+    }
+
+    document.querySelector("#closeScreen").addEventListener("click", () => {
+      if (!selectedDisk) return;
+
+      document.querySelector("#screenUI").classList.add("hidden");
+      selectedDisk.position.copy(animationFrom.position);
+      selectedDisk.rotation.copy(animationFrom.rotation);
+      selectedDisk.scale.copy(animationFrom.scale);
+
+      selectedDisk = null;
+      hoveredDisk = null;
+      mode = "idle";
+
+      camera.position.copy(homeCamera.position);
+      controls.target.copy(homeCamera.target);
+      labelsRoot.classList.remove("labels-hidden");
+      document.querySelector("#intro").classList.remove("hidden");
+    });
+
+    function updateHover(time) {
+      if (!model) return;
+      const speed = 0.13;
+
+      diskNames.forEach(name => {
+        const disk = model.getObjectByName(name);
+        if (!disk) return;
+
+        const base = disk.userData.baseScale || disk.scale.clone();
+        disk.userData.baseScale = base;
+
+        const targetScale = (disk === hoveredDisk && mode === "idle") ? 1.14 : 1;
+        disk.scale.lerp(
+          base.clone().multiplyScalar(targetScale),
+          speed
+        );
+
+        const targetZ = (disk === hoveredDisk && mode === "idle")
+          ? (disk.userData.baseZ ?? disk.position.z) + 0.32
+          : (disk.userData.baseZ ?? disk.position.z);
+
+        disk.userData.baseZ ??= disk.position.z;
+        disk.position.z += (targetZ - disk.position.z) * 0.13;
+      });
+    }
+
+    function updateLabels() {
+      if (!model || mode !== "idle") return;
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      diskNames.forEach(name => {
+        const disk = model.getObjectByName(name);
+        const el = labelEls.get(name);
+        if (!disk || !el) return;
+
+        disk.getWorldPosition(worldPoint);
+        worldPoint.y += 1.05;
+        worldPoint.project(camera);
+
+        const x = rect.left + (worldPoint.x * 0.5 + 0.5) * rect.width;
+        const y = rect.top + (-worldPoint.y * 0.5 + 0.5) * rect.height;
+
+        el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+        el.classList.toggle("active", disk === hoveredDisk);
+      });
+    }
+
+    function animate(time) {
+      requestAnimationFrame(animate);
+      updateInsertion(time);
+      updateZoom(time);
+      updateHover(time);
+      updateLabels();
+
+      controls.enabled = mode === "idle";
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    requestAnimationFrame(animate);
+
+    addEventListener("resize", () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+  </script>
+</body>
+</html>

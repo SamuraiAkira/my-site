@@ -46,10 +46,8 @@ body{cursor:default}
 .carousel-hint i{width:100px;height:1px;background:linear-gradient(90deg,transparent,#686860,transparent)}
 .carousel-hint b{font-weight:400}
 
-#screenUI{position:fixed;z-index:20;inset:0;display:grid;place-items:center;background:rgba(2,4,2,.28);backdrop-filter:blur(2px)}
-.screen-frame{position:relative;width:min(760px,80vw);min-height:420px;padding:54px 48px 44px;border:1px solid rgba(156,255,174,.5);background:rgba(5,12,7,.97);box-shadow:0 0 100px rgba(80,255,120,.1),inset 0 0 60px rgba(80,255,120,.025)}
-.screen-frame:before{content:"";position:absolute;inset:8px;border:1px solid rgba(156,255,174,.08);pointer-events:none}
-.screen-top{position:absolute;top:18px;left:48px;right:48px;display:flex;justify-content:space-between;color:#597c60;font-size:9px;letter-spacing:.15em}
+#screenUI{position:fixed;z-index:20;inset:0;display:grid;place-items:center;background:rgba(2,4,2,.28);backdrop-filter:blur(2px);pointer-events:auto}
+#screenUI.hidden{display:none!important;pointer-events:none}
 #closeScreen{position:absolute;z-index:2;top:10px;right:18px;border:0;background:none;color:#9cffae;font:28px var(--mono);cursor:pointer}
 .terminal{color:#9cffae;font-size:15px;line-height:1.8;text-shadow:0 0 7px rgba(156,255,174,.18)}
 .terminal .title{padding-bottom:12px;margin-bottom:24px;border-bottom:1px solid rgba(156,255,174,.25);font-size:12px;letter-spacing:.08em}

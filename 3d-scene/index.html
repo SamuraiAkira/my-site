@@ -30,7 +30,6 @@
     <div class="brand">
       PORTFOLIO<span>_A:</span>
     </div>
-
     <div class="status">
       <i></i>
       SYSTEM READY
@@ -51,14 +50,45 @@
     <p class="sub">Hover to inspect · Click to insert</p>
   </section>
 
-  <div id="screenUI" class="hidden">
-    <button id="closeScreen" aria-label="Закрыть">×</button>
-    <div class="screen-frame">
-      <div class="screen-top">
-        <span>FLOPPY://READ</span>
-        <span>● ONLINE</span>
+  <div class="carousel-hint">
+    <span>←</span>
+    <div>
+      <b>01</b>
+      <i></i>
+      <b>06</b>
+    </div>
+    <span>→</span>
+  </div>
+
+  <!-- ======================================================
+       TERMINAL
+       ====================================================== -->
+
+  <div id="terminal" class="hidden" aria-hidden="true">
+    <div class="terminal-window">
+
+      <div class="terminal-titlebar">
+        <div class="terminal-title">
+          <span class="terminal-icon">▣</span>
+          <span>terminal</span>
+          <span class="terminal-sep">—</span>
+          <span id="terminalPath">A:\</span>
+        </div>
+
+        <button
+          id="terminalClose"
+          class="terminal-close"
+          aria-label="Закрыть"
+        >×</button>
       </div>
-      <div id="screenContent"></div>
+
+      <div class="terminal-body" id="terminalBody">
+        <pre id="terminalOutput"></pre>
+      </div>
+
+      <div class="terminal-scanline"></div>
+      <div class="terminal-vignette"></div>
+
     </div>
   </div>
 

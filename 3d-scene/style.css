@@ -33,14 +33,6 @@ body{cursor:default}
 #intro h1 em{font-style:normal;color:#fff}
 .sub{margin:15px 0 0;color:#77776f;font-size:10px;letter-spacing:.08em}
 
-#diskLabels{position:fixed;inset:0;z-index:8;pointer-events:none;transition:opacity .35s}
-.labels-hidden{opacity:0}
-.disk-label{position:absolute;left:0;top:0;text-align:center;transform-origin:center;transition:opacity .2s,filter .2s}
-.disk-label span{display:block;font-size:9px;letter-spacing:.16em;color:#696961;margin-bottom:5px}
-.disk-label b{display:block;font-size:11px;letter-spacing:.14em;color:#d7d0bf;font-weight:500;padding:5px 8px;border:1px solid transparent;background:rgba(8,9,8,.5);backdrop-filter:blur(3px)}
-.disk-label.active b{color:#9cffae;border-color:rgba(156,255,174,.55);box-shadow:0 0 22px rgba(156,255,174,.08)}
-.disk-label.active span{color:#9cffae}
-
 .carousel-hint{position:fixed;z-index:10;bottom:27px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;color:#66665f;pointer-events:none;font-size:13px}
 .carousel-hint div{display:flex;align-items:center;gap:10px;font-size:9px;letter-spacing:.1em}
 .carousel-hint i{width:100px;height:1px;background:linear-gradient(90deg,transparent,#686860,transparent)}

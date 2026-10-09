@@ -249,36 +249,6 @@ function setUIOpacity(value) {
 
 
 // ============================================================
-// CREATE DISK LABELS
-// ============================================================
-
-function createDiskLabels() {
-
-  labelsRoot.innerHTML = "";
-
-  diskNames.forEach((name, index) => {
-
-    const el = document.createElement("div");
-
-    el.className = "disk-label";
-
-    el.innerHTML = `
-      <span>0${index + 1}</span>
-      <b>${diskLabels[name]}</b>
-    `;
-
-    el.style.pointerEvents = "none";
-
-    labelsRoot.appendChild(el);
-
-    labelEls.set(name, el);
-
-  });
-
-}
-
-
-// ============================================================
 // LOADING
 // ============================================================
 
@@ -361,7 +331,6 @@ loader.load(
     introAnimationStart = performance.now();
     mode = "intro";
 
-    createDiskLabels();
     collectUIElements();
     setUIOpacity(0);
     showLoading(false);
@@ -805,43 +774,6 @@ function returnDisk() {
 
 
 // ============================================================
-// DISK LABELS
-// ============================================================
-
-function updateLabels() {
-
-  if (!model) return;
-
-  const rect = renderer.domElement.getBoundingClientRect();
-
-  diskNames.forEach((name) => {
-
-    const disk = model.getObjectByName(name);
-    const el = labelEls.get(name);
-
-    if (!disk || !el) return;
-
-    disk.getWorldPosition(worldPoint);
-
-    worldPoint.y += 1.05;
-    worldPoint.project(camera);
-
-    const x = rect.left + ( worldPoint.x * 0.5 + 0.5) * rect.width;
-    const y = rect.top  + (-worldPoint.y * 0.5 + 0.5) * rect.height;
-
-    el.style.transform =
-      `translate(-50%, -50%) translate(${x}px, ${y}px)`;
-
-    el.style.opacity = uiOpacity.toString();
-
-    el.classList.toggle("active", disk === hoveredDisk);
-
-  });
-
-}
-
-
-// ============================================================
 // CINEMATIC INTRO
 // ============================================================
 
@@ -923,8 +855,6 @@ function animate(time) {
   if (mode === "returningDisk") {
     returnDisk();
   }
-
-  updateLabels();
 
   controls.enabled = mode === "idle";
   controls.update();

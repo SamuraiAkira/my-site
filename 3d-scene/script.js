@@ -439,8 +439,8 @@ renderer.domElement.addEventListener("pointerdown", (event) => {
 // FLOPPY DRIVE / INSERT / RETURN
 // ============================================================
 
-const DRIVE_SLOT_POSITION   = new THREE.Vector3(-1.3, 2.55,  0.15);
-const DRIVE_INSIDE_POSITION = new THREE.Vector3(-1.3, 2.55, -0.75);
+const DRIVE_SLOT_POSITION   = new THREE.Vector3(-1.3, 2.25,  0.75);
+const DRIVE_INSIDE_POSITION = new THREE.Vector3(-1.3, 2.25, 0.75);
 
 const DISK_ANIMATION_DURATION = 2400;
 const CAMERA_ZOOM_DURATION    = 1000;
